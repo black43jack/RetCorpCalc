@@ -4,8 +4,12 @@
     <meta charset="UTF-8">
     <title>Retirement Corpus Calculator</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://fonts.googleapis.com/css2?family=Aptos:wght@400;700&display=swap" rel="stylesheet">
     <style>
-        body { font-family: Arial, sans-serif; margin: 0; background: #f7f7f7; }
+        html, body, * {
+            font-family: 'Aptos', Arial, sans-serif !important;
+        }
+        body { margin: 0; background: #f7f7f7; }
         .title-bar {
             background: #2c3e50;
             color: #fff;
@@ -15,87 +19,568 @@
             font-weight: bold;
             letter-spacing: 1px;
         }
-        .container { background: #fff; padding: 24px; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); max-width: 400px; margin: 40px auto; }
-        label { display: block; margin-top: 16px; }
-        input[type="number"] { width: 100%; padding: 8px; margin-top: 4px; }
+        .container { background: #fff; padding: 24px; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); max-width: 900px; margin: 40px auto; }
+        .swimlane {
+            background: #eaf6ff;
+            border-radius: 8px;
+            padding: 18px 16px;
+            margin-bottom: 24px;
+        }
+        .output-swimlane {
+            background: #f9f9f9;
+            border-radius: 8px;
+            padding: 18px 16px;
+            margin-bottom: 24px;
+            box-shadow: 0 1px 4px rgba(0,0,0,0.04);
+        }
+        .output-title {
+            font-size: 1.2em;
+            font-weight: bold;
+            margin-bottom: 12px;
+        }
+        .output-row {
+            display: flex;
+            gap: 32px;
+            margin-bottom: 8px;
+            align-items: center;
+        }
+        .output-value {
+            font-weight: bold;
+            color: #1a7f37;
+            margin-left: auto;
+            text-align: right;
+            min-width: 120px;
+            font-size: 1.6em;
+        }
+        .output-separator {
+            border-top: 2px solid #e0e0e0;
+            margin: 12px 0 8px 0;
+        }
+        .output-label {
+            min-width: 120px;
+            color: #2c3e50;
+        }
+        .output-value {
+        font-weight: bold;
+        color: #1a7f37;
+        font-size: 1.35em;
+        }
+        .form-row {
+            display: flex;
+            gap: 24px;
+            align-items: flex-end;
+        }
+        .form-group {
+            flex: 1 1 200px;
+            min-width: 200px;
+        }
+        label { display: block; margin-bottom: 8px; }
+        input[type="number"] {
+            width: 100%;
+            padding: 8px;
+            margin-top: 4px;
+            box-sizing: border-box;
+            font-family: 'Aptos', Arial, sans-serif !important;
+        }
+        input[type="range"] {
+            width: 100%;
+            accent-color: #2c3e50;
+            margin-bottom: 8px;
+            font-family: 'Aptos', Arial, sans-serif !important;
+        }
         button { margin-top: 20px; padding: 10px 20px; background: #2c3e50; color: #fff; border: none; border-radius: 4px; cursor: pointer; }
         .result { margin-top: 24px; font-weight: bold; }
-        #chartContainer { margin-top: 32px; }
+        #chartContainer {
+            margin-top: 32px;
+            min-height: 400px;
+            max-width: 900px;
+            margin-left: auto;
+            margin-right: auto;
+            background: #fff;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+            border: 1px solid #ccc;
+            padding: 16px 12px 24px 12px;
+        }
+        #growthChart {
+            display: block;
+            margin: 0 auto;
+            max-width: 100%;
+            height: 400px;
+            background: #fff;
+            border-radius: 8px;
+        }
     </style>
 </head>
 <body>
     <div class="title-bar">Retirement Corpus Calculator</div>
     <div class="container">
         <form id="fdForm">
-            <label for="fdAmount">FD Amount (₹):</label>
-            <input type="number" id="fdAmount" required>
-
-            <label for="rateOfReturn">Rate of Return (% per annum):</label>
-            <input type="number" id="rateOfReturn" required>
-
-            <label for="presentAge">Present Age:</label>
-            <input type="number" id="presentAge" required>
-
-            <label for="retirementAge">Retirement Age:</label>
-            <input type="number" id="retirementAge" required>
-
+            <div class="swimlane">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="presentAge">Present Age:</label>
+<input type="number" id="presentAge" required value="35">
+                    </div>
+                    <div class="form-group">
+                        <label for="retirementAge">Retirement Age:</label>
+<input type="number" id="retirementAge" required value="60" max="100">
+                    </div>
+                </div>
+            </div>
+            <div class="swimlane">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="fdAmount">FD Amount (₹):</label>
+                        <div class="slider-value-label" id="fdAmountLabel" style="font-size:1.1em; color:#2c3e50; margin-bottom:2px; font-family:'Aptos',Arial,sans-serif;"></div>
+                        <input type="range" id="fdAmountSlider" min="0" max="5000000" step="50000" value="0" style="width:100%; margin-bottom:8px;">
+                    </div>
+                    <div class="form-group">
+                        <label for="fdRate">Rate of Return (%):</label>
+                        <input type="number" id="fdRate" required>
+                    </div>
+                </div>
+            </div>
+            <div class="swimlane">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="rdAmount">RD Amount (₹ Monthly):</label>
+                        <div class="slider-value-label" id="rdAmountLabel" style="font-size:1.1em; color:#2c3e50; margin-bottom:2px; font-family:'Aptos',Arial,sans-serif;"></div>
+                        <input type="range" id="rdAmountSlider" min="0" max="50000" step="1000" value="0" style="width:100%; margin-bottom:8px;">
+                    </div>
+                    <div class="form-group">
+                        <label for="rdRate">Rate of Return (%):</label>
+                        <input type="number" id="rdRate" required>
+                    </div>
+                </div>
+            </div>
+            <div class="swimlane">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="mfAmount">MF SIP Amount (₹ Monthly):</label>
+                        <div class="slider-value-label" id="mfAmountLabel" style="font-size:1.1em; color:#2c3e50; margin-bottom:2px; font-family:'Aptos',Arial,sans-serif;"></div>
+                        <input type="range" id="mfAmountSlider" min="0" max="100000" step="1000" value="0" style="width:100%; margin-bottom:8px;">
+                    </div>
+                    <div class="form-group">
+                        <label for="mfRate">MF Expected Return (%):</label>
+                        <input type="number" id="mfRate" required>
+                    </div>
+                </div>
+                <div class="form-row" style="margin-top:12px; align-items:center;">
+                    <div class="form-group" style="max-width:220px;">
+                        <label for="mfStepUpToggle">SIP Step-up:</label>
+                        <input type="checkbox" id="mfStepUpToggle" style="width:24px; height:24px; vertical-align:middle;">
+                    </div>
+                    <div class="form-group" id="mfStepUpGroup" style="max-width:220px; display:none;">
+                        <label for="mfStepUpPercent">Step-up % per year:</label>
+                        <input type="number" id="mfStepUpPercent" min="0" max="100" value="10">
+                    </div>
+                </div>
+            </div>
+            <div class="swimlane">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="mfLumpAmount">MF Lumpsum Amount (₹):</label>
+                        <div class="slider-value-label" id="mfLumpAmountLabel" style="font-size:1.1em; color:#2c3e50; margin-bottom:2px; font-family:'Aptos',Arial,sans-serif;"></div>
+                        <input type="range" id="mfLumpAmountSlider" min="0" max="5000000" step="10000" value="0" style="width:100%; margin-bottom:8px;">
+                    </div>
+                    <div class="form-group">
+                        <label for="mfLumpRate">MF Lumpsum Expected Return (%):</label>
+                        <input type="number" id="mfLumpRate" required>
+                    </div>
+                </div>
+            </div>
+            <div class="swimlane">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="equityAmount">Equity Portfolio Amount (₹):</label>
+                        <div class="slider-value-label" id="equityAmountLabel" style="font-size:1.1em; color:#2c3e50; margin-bottom:2px; font-family:'Aptos',Arial,sans-serif;"></div>
+                        <input type="range" id="equityAmountSlider" min="0" max="10000000" step="50000" value="0" style="width:100%; margin-bottom:8px;">
+                    </div>
+                    <div class="form-group">
+                        <label for="equityRate">Equity Portfolio Expected Return (%):</label>
+                        <input type="number" id="equityRate" required>
+                    </div>
+                </div>
+            </div>
+            <div class="swimlane">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="npsAmount">NPS Contribution (₹) Monthly:</label>
+                        <div class="slider-value-label" id="npsAmountLabel" style="font-size:1.1em; color:#2c3e50; margin-bottom:2px; font-family:'Aptos',Arial,sans-serif;"></div>
+                        <input type="range" id="npsAmountSlider" min="0" max="50000" step="1000" value="0" style="width:100%; margin-bottom:8px;">
+                    </div>
+                    <div class="form-group">
+                        <label for="npsRate">NPS Expected Return (%):</label>
+                        <input type="number" id="npsRate" required>
+                    </div>
+                </div>
+                <div class="form-row" style="margin-top:12px; align-items:center;">
+                    <div class="form-group" style="max-width:220px;">
+                        <label for="npsLumpPercent">Lump Sum Withdrawal (%):</label>
+                        <input type="number" id="npsLumpPercent" min="0" max="100" value="60">
+                    </div>
+                    <div class="form-group" style="max-width:220px;">
+                        <label for="npsAnnuityRate">Expected Annuity Rate (%):</label>
+                        <input type="number" id="npsAnnuityRate" min="0" max="20" value="6">
+                    </div>
+                </div>
+            </div>
             <button type="submit">Calculate</button>
         </form>
+        <div class="output-swimlane" id="outputSwimlane" style="display:none;">
+            <div class="output-title">Maturity Amount on Retirement</div>
+            <div class="output-row">
+                <span class="output-label">FD Maturity:</span>
+                <span class="output-value" id="fdMaturity"></span>
+            </div>
+            <div class="output-row">
+                <span class="output-label">RD Maturity:</span>
+                <span class="output-value" id="rdMaturity"></span>
+            </div>
+            <div class="output-row">
+                <span class="output-label">MF SIP Maturity:</span>
+                <span class="output-value" id="mfMaturity"></span>
+            </div>
+            <div class="output-row">
+                <span class="output-label">MF Lumpsum Maturity:</span>
+                <span class="output-value" id="mfLumpMaturity"></span>
+            </div>
+            <div class="output-row">
+                <span class="output-label">Equity Portfolio Maturity:</span>
+                <span class="output-value" id="equityMaturity"></span>
+            </div>
+            
+            <div class="output-row">
+                <span class="output-label">NPS Lumpsum Withdrawal:</span>
+                <span class="output-value" id="npsLumpValue"></span>
+            </div>
+            <div class="output-row">
+                <span class="output-label">NPS Annuity: <span style="font-style:italic; font-size:0.95em; color:#888;">(Not considered towards Total Corpus)</span></span>
+                <span class="output-value" id="npsAnnuityValue"></span>
+            </div>
+            <div class="output-separator" style="border-top:3px solid #2c3e50; margin:18px 0 10px 0;"></div>
+            <div class="output-row" style="display:flex; align-items:center; gap:32px;">
+                <span class="output-label" style="font-weight:bold; font-size:1.15em; color:#2c3e50; min-width:120px;">Total Corpus:</span>
+                <span class="output-value" id="totalCorpus" style="font-weight:bold; font-size:1.25em; color:#1a7f37; margin-left:auto; text-align:right; min-width:120px;"></span>
+            </div>
+        </div>
         <div class="result" id="result"></div>
         <div id="chartContainer">
-            <canvas id="growthChart" width="350" height="250"></canvas>
+            <canvas id="growthChart" width="900" height="400"></canvas>
         </div>
     </div>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script>
-        document.getElementById('fdForm').addEventListener('submit', function(e) {
-            e.preventDefault();
-            const fdAmount = parseFloat(document.getElementById('fdAmount').value);
-            const rate = parseFloat(document.getElementById('rateOfReturn').value) / 100;
-            const presentAge = parseInt(document.getElementById('presentAge').value);
-            const retirementAge = parseInt(document.getElementById('retirementAge').value);
-            const years = retirementAge - presentAge;
+    function formatIndian(num) {
+        return num.toLocaleString('en-IN');
+    }
+    function updateSliderLabel(sliderId, labelId) {
+        const slider = document.getElementById(sliderId);
+        const label = document.getElementById(labelId);
+        label.textContent = '₹' + formatIndian(Number(slider.value));
+    }
+    function syncSliderWithLabel(sliderId, labelId) {
+        const slider = document.getElementById(sliderId);
+        const label = document.getElementById(labelId);
+        slider.addEventListener('input', function() {
+            label.textContent = '₹' + formatIndian(Number(slider.value));
+            calculateCorpus();
+        });
+        // Initial label
+        label.textContent = '₹' + formatIndian(Number(slider.value));
+    }
+    syncSliderWithLabel('fdAmountSlider', 'fdAmountLabel');
+    syncSliderWithLabel('rdAmountSlider', 'rdAmountLabel');
+    syncSliderWithLabel('mfAmountSlider', 'mfAmountLabel');
+    syncSliderWithLabel('mfLumpAmountSlider', 'mfLumpAmountLabel');
+    syncSliderWithLabel('equityAmountSlider', 'equityAmountLabel');
+    syncSliderWithLabel('npsAmountSlider', 'npsAmountLabel');
+    document.getElementById('npsAmountSlider').addEventListener('input', function() {
+        calculateCorpus();
+    });
+    document.getElementById('npsRate').addEventListener('input', calculateCorpus);
+    document.getElementById('npsLumpPercent').addEventListener('input', calculateCorpus);
+    document.getElementById('npsAnnuityRate').addEventListener('input', calculateCorpus);
+    document.getElementById('mfAmountSlider').addEventListener('input', function() {
+        calculateCorpus();
+    });
+    document.getElementById('mfRate').addEventListener('input', calculateCorpus);
+    document.getElementById('mfStepUpToggle').addEventListener('change', function() {
+        document.getElementById('mfStepUpGroup').style.display = this.checked ? 'block' : 'none';
+        calculateCorpus();
+    });
+    document.getElementById('mfStepUpPercent').addEventListener('input', calculateCorpus);
+    document.getElementById('mfLumpAmountSlider').addEventListener('input', function() {
+        calculateCorpus();
+    });
+    document.getElementById('mfLumpRate').addEventListener('input', calculateCorpus);
+    document.getElementById('equityAmountSlider').addEventListener('input', function() {
+        calculateCorpus();
+    });
+    document.getElementById('equityRate').addEventListener('input', calculateCorpus);
 
-            // Calculate year-wise corpus growth
-            let corpus = fdAmount;
-            let data = [];
-            let labels = [];
-            for (let i = 1; i <= years; i++) {
-                corpus *= (1 + rate);
-                data.push(Math.round(corpus));
-                labels.push(presentAge + i);
+    // Also auto-calculate when other inputs change
+    ['fdRate','rdRate','presentAge','retirementAge'].forEach(function(id) {
+        document.getElementById(id).addEventListener('input', calculateCorpus);
+    });
+
+    document.getElementById('fdForm').addEventListener('submit', function(e) {
+        e.preventDefault();
+        calculateCorpus();
+    });
+
+    function calculateCorpus() {
+        // Get inputs
+        const fdAmount = parseFloat(document.getElementById('fdAmountSlider').value) || 0;
+        const fdRate = parseFloat(document.getElementById('fdRate').value) / 100 || 0;
+        const rdAmount = parseFloat(document.getElementById('rdAmountSlider').value) || 0;
+        const rdRate = parseFloat(document.getElementById('rdRate').value) / 100 || 0;
+        const mfAmount = parseFloat(document.getElementById('mfAmountSlider').value) || 0;
+        const mfRate = parseFloat(document.getElementById('mfRate').value) / 100 || 0;
+        const mfStepUp = document.getElementById('mfStepUpToggle').checked;
+        const mfStepUpPercent = mfStepUp ? (parseFloat(document.getElementById('mfStepUpPercent').value) || 0) : 0;
+        const mfLumpAmount = parseFloat(document.getElementById('mfLumpAmountSlider').value) || 0;
+        const mfLumpRate = parseFloat(document.getElementById('mfLumpRate').value) / 100 || 0;
+        const equityAmount = parseFloat(document.getElementById('equityAmountSlider').value) || 0;
+        const equityRate = parseFloat(document.getElementById('equityRate').value) / 100 || 0;
+        const npsAmount = parseFloat(document.getElementById('npsAmountSlider').value) || 0;
+        const npsRate = parseFloat(document.getElementById('npsRate').value) / 100 || 0;
+        const npsLumpPercent = parseFloat(document.getElementById('npsLumpPercent').value) || 60;
+        const npsAnnuityRate = parseFloat(document.getElementById('npsAnnuityRate').value) / 100 || 0.06;
+        const presentAge = parseInt(document.getElementById('presentAge').value) || 0;
+        const retirementAge = parseInt(document.getElementById('retirementAge').value) || 0;
+        const years = retirementAge - presentAge;
+        updateSliderLabel('fdAmountSlider', 'fdAmountLabel');
+        updateSliderLabel('rdAmountSlider', 'rdAmountLabel');
+        updateSliderLabel('mfAmountSlider', 'mfAmountLabel');
+        updateSliderLabel('mfLumpAmountSlider', 'mfLumpAmountLabel');
+        updateSliderLabel('equityAmountSlider', 'equityAmountLabel');
+        if (years <= 0 || fdRate < 0 || rdRate < 0) {
+            document.getElementById('outputSwimlane').style.display = 'none';
+            if (window.growthChart && typeof window.growthChart.destroy === 'function') {
+                window.growthChart.destroy();
             }
+            return;
+        }
 
-            document.getElementById('result').textContent =
-                "FD Maturity Amount at Retirement: ₹" + corpus.toLocaleString(undefined, {maximumFractionDigits: 0});
+        // Calculate FD corpus year-wise
+        let fdCorpus = fdAmount;
+        let fdData = [fdCorpus];
+        let labels = [presentAge];
+        for (let i = 1; i <= years; i++) {
+            fdCorpus *= (1 + fdRate);
+            fdData.push(Math.round(fdCorpus));
+            labels.push(presentAge + i);
+        }
 
-            // Draw chart
-            const ctx = document.getElementById('growthChart').getContext('2d');
-            if (window.growthChart) window.growthChart.destroy();
-            window.growthChart = new Chart(ctx, {
-                type: 'line',
-                data: {
-                    labels: labels,
-                    datasets: [{
-                        label: 'Corpus Growth (₹)',
-                        data: data,
+        // Calculate RD corpus year-wise (using standard Indian RD formula)
+        let rdData = [0];
+        const months = years * 12;
+        let totalData = [fdData[0] + rdData[0]];
+        let validRD = rdAmount > 0 && rdRate > 0;
+        if (validRD) {
+            const monthlyRate = rdRate / 12;
+            for (let i = 1; i <= years; i++) {
+                let n = i * 12;
+                let maturity = rdAmount * ((Math.pow(1 + monthlyRate, n) - 1) / (1 - Math.pow(1 + monthlyRate, -1)));
+                rdData.push(Math.round(maturity));
+            }
+        } else {
+            for (let i = 1; i <= years; i++) {
+                rdData.push(0);
+            }
+        }
+
+        // Calculate MF SIP corpus year-wise (with correct step-up logic)
+        let mfData = [0];
+        for (let year = 1; year <= years; year++) {
+            let totalFV = 0;
+            let r = Math.pow(1 + mfRate, 1/12) - 1;
+            let n = year * 12;
+            for (let m = 1; m <= n; m++) {
+                // Determine which year this month falls in
+                let stepYear = Math.floor((m - 1) / 12);
+                let sip = mfAmount * Math.pow(1 + mfStepUpPercent / 100, mfStepUp ? stepYear : 0);
+                // FV for this installment
+                let monthsInvested = n - m + 1;
+                let fv = sip * Math.pow(1 + r, monthsInvested);
+                totalFV += fv;
+            }
+            mfData.push(Math.round(totalFV));
+        }
+
+        // Calculate MF Lumpsum corpus year-wise
+        let mfLumpData = [mfLumpAmount];
+        let lumpCorpus = mfLumpAmount;
+        for (let i = 1; i <= years; i++) {
+            lumpCorpus *= (1 + mfLumpRate);
+            mfLumpData.push(Math.round(lumpCorpus));
+        }
+
+        // Calculate Equity Portfolio corpus year-wise
+        let equityData = [equityAmount];
+        let equityCorpus = equityAmount;
+        for (let i = 1; i <= years; i++) {
+            equityCorpus *= (1 + equityRate);
+            equityData.push(Math.round(equityCorpus));
+        }
+
+        // Calculate NPS corpus year-wise (SIP formula)
+        let npsData = [0];
+        let npsCorpus = 0;
+        if (npsAmount > 0 && npsRate > 0 && years > 0) {
+            let r = Math.pow(1 + npsRate, 1/12) - 1;
+            let n = years * 12;
+            npsCorpus = Math.round(npsAmount * ((Math.pow(1 + r, n) - 1) / r) * (1 + r));
+        }
+        for (let i = 1; i <= years; i++) {
+            let r = Math.pow(1 + npsRate, 1/12) - 1;
+            let n = i * 12;
+            let corpus = npsAmount * ((Math.pow(1 + r, n) - 1) / r) * (1 + r);
+            npsData.push(Math.round(corpus));
+        }
+        // NPS Lump Sum and Annuity
+        let npsLump = Math.round(npsCorpus * npsLumpPercent / 100);
+        let npsAnnuity = Math.round(npsCorpus - npsLump);
+
+        // Update totalData to include only FD, RD, MF SIP, MF Lumpsum, and Equity Portfolio corpus
+        // For Total Corpus, include only NPS Lumpsum Withdrawal at retirement
+        totalData = [fdData[0] + rdData[0] + mfData[0] + mfLumpData[0] + equityData[0]];
+        for (let i = 1; i <= years; i++) {
+            if (i === years) {
+                totalData.push(fdData[i] + rdData[i] + mfData[i] + mfLumpData[i] + equityData[i] + npsLump);
+            } else {
+                totalData.push(fdData[i] + rdData[i] + mfData[i] + mfLumpData[i] + equityData[i]);
+            }
+        }
+
+        // Output swimlane
+        document.getElementById('outputSwimlane').style.display = 'block';
+        document.getElementById('fdMaturity').textContent = '₹' + formatIndian(fdData[years]);
+        document.getElementById('rdMaturity').textContent = '₹' + formatIndian(rdData[years]);
+        document.getElementById('mfMaturity').textContent = '₹' + formatIndian(mfData[years]);
+        document.getElementById('mfLumpMaturity').textContent = '₹' + formatIndian(mfLumpData[years]);
+        document.getElementById('equityMaturity').textContent = '₹' + formatIndian(equityData[years]);
+        document.getElementById('npsLumpValue').textContent = '₹' + formatIndian(npsLump);
+        document.getElementById('npsAnnuityValue').textContent = '₹' + formatIndian(npsAnnuity);
+        document.getElementById('totalCorpus').textContent = '₹' + formatIndian(totalData[years]);
+
+        // Draw chart
+        const ctx = document.getElementById('growthChart').getContext('2d');
+        if (window.growthChart && typeof window.growthChart.destroy === 'function') {
+            window.growthChart.destroy();
+        }
+        window.growthChart = new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: labels,
+                datasets: [
+                    {
+                        label: 'FD',
+                        data: fdData,
                         borderColor: '#2c3e50',
                         backgroundColor: 'rgba(44,62,80,0.1)',
-                        fill: true,
+                        fill: false,
                         tension: 0.2
-                    }]
-                },
-                options: {
-                    scales: {
-                        x: { title: { display: true, text: 'Age' } },
-                        y: { title: { display: true, text: 'Corpus (₹)' } }
                     },
-                    plugins: {
-                        legend: { display: false }
+                    {
+                        label: 'RD',
+                        data: rdData,
+                        borderColor: '#1a7f37',
+                        backgroundColor: 'rgba(26,127,55,0.1)',
+                        fill: false,
+                        tension: 0.2
+                    },
+                    {
+                        label: 'MF SIP',
+                        data: mfData,
+                        borderColor: '#2980b9',
+                        backgroundColor: 'rgba(41,128,185,0.1)',
+                        fill: false,
+                        tension: 0.2
+                    },
+                    {
+                        label: 'MF Lumpsum',
+                        data: mfLumpData,
+                        borderColor: '#8e44ad',
+                        backgroundColor: 'rgba(142,68,173,0.1)',
+                        fill: false,
+                        tension: 0.2
+                    },
+                    {
+                        label: 'Equity',
+                        data: equityData,
+                        borderColor: '#d35400',
+                        backgroundColor: 'rgba(211,84,0,0.1)',
+                        fill: false,
+                        tension: 0.2
+                    },
+                    {
+                        label: 'NPS Corpus',
+                        data: npsData,
+                        borderColor: '#16a085',
+                        backgroundColor: 'rgba(22,160,133,0.1)',
+                        fill: false,
+                        tension: 0.2
+                    },
+                    {
+                        label: 'Total Corpus',
+                        data: totalData,
+                        borderColor: '#e67e22',
+                        backgroundColor: 'rgba(230,126,34,0.1)',
+                        fill: false,
+                        tension: 0.2
+                    }
+                ]
+            },
+            options: {
+                scales: {
+                    x: { title: { display: true, text: 'Age' } },
+                    y: { title: { display: true, text: 'Corpus' } }
+                },
+                plugins: {
+                    legend: { display: true },
+                    tooltip: {
+                        bodyFont: { family: 'Aptos, Arial, sans-serif' },
+                        titleFont: { family: 'Aptos, Arial, sans-serif' },
+                        callbacks: {
+                            title: function(context) {
+                                return 'Age : ' + context[0].label;
+                            },
+                            label: function(context) {
+                                // Show only the dataset value label (default)
+                                return context.dataset.label + ' : ₹' + formatIndian(context.parsed.y);
+                            },
+                            footer: function(context) {
+                                // Show corpus breakdown for the hovered index
+                                let idx = context[0].dataIndex;
+                                let fd = fdData[idx];
+                                let rd = rdData[idx];
+                                let mf = mfData[idx];
+                                let mfLump = mfLumpData[idx];
+                                let equity = equityData[idx];
+                                let nps = npsData[idx];
+                                let total = totalData[idx];
+                                return [
+                                    'FD : ₹' + formatIndian(fd),
+                                    'RD : ₹' + formatIndian(rd),
+                                    'MF SIP : ₹' + formatIndian(mf),
+                                    'MF Lumpsum : ₹' + formatIndian(mfLump),
+                                    'Equity : ₹' + formatIndian(equity),
+                                    'NPS Corpus : ₹' + formatIndian(nps),
+                                    'Total Corpus : ₹' + formatIndian(total)
+                                ];
+                            }
+                        }
                     }
                 }
-            });
+            },
         });
+        //console.log('Chart rendered:', {fdData, rdData, totalData});
+    }
+    // Initial calculation (if default values are set)
+    calculateCorpus();
     </script>
 </body>
 </html>
